@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="加拿大留学生月度预算计算器：学费折算、多项收入、支出占比与省钱建议。数据仅在浏览器计算。">
+<title>加拿大留学生预算计算器</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#203731;background:#f3f6f3;line-height:1.6;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:44px 24px}header{margin-bottom:28px}.eyebrow{color:#527264;font-size:13px;letter-spacing:2px;font-weight:700}h1{font-size:clamp(26px,4vw,38px);letter-spacing:-1px;margin:8px 0}h2{font-size:19px;margin:0 0 18px}h3{font-size:16px;margin:24px 0 12px}p{margin:6px 0;color:#64746c}.privacy{display:inline-block;background:#e3eee6;border-radius:25px;padding:6px 13px;font-size:13px;color:#315f49;margin-top:12px}.layout{display:grid;grid-template-columns:1fr 1.15fr;gap:24px;align-items:start}.card{background:white;border:1px solid #e0e8e1;border-radius:20px;padding:26px;box-shadow:0 8px 32px #213c2d05}.fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}label{display:block;font-size:14px;font-weight:600}input,select{font:inherit;width:100%;min-width:0;border:1px solid #cbd8ce;border-radius:9px;padding:10px 12px;background:#fcfdfb;color:#203731;margin-top:6px}input:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid #a9cdb9;outline-offset:2px}input:invalid{border-color:#b84a43}.hint{font-size:12px;margin-top:10px}button{font:inherit;cursor:pointer;border:1px solid #cbd8ce;border-radius:9px;background:#f4f8f4;color:#315f49;padding:8px 12px}button:hover{background:#e6f0e8}.income-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:12px}.remove{height:46px;color:#92514b;background:white}.income-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:24px 0 14px}.income-heading h3{margin:0}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{background:#f4f7f3;border-radius:12px;padding:14px}.metric span{font-size:13px;color:#64746c}.amount{display:block;font-size:clamp(19px,2.5vw,26px);font-weight:750;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.balance{grid-column:1/-1;background:#e7f3e9;color:#246144}.balance.negative{background:#fff0ed;color:#b44135}.balance.neutral{background:#f1f3f1;color:#52635b}.balance span{color:inherit}#balance-status{font-size:13px;font-weight:400;margin-top:3px}.chart-row{margin:12px 0}.chart-label{display:flex;justify-content:space-between;font-size:13px;gap:12px}.track{height:9px;background:#eef2ed;border-radius:8px;margin-top:5px;overflow:hidden}.bar{height:100%;border-radius:8px;transition:width .18s}.share{display:flex;height:20px;border-radius:8px;overflow:hidden;background:#eef2ed;margin:12px 0}.share div{height:100%}.legend{display:flex;flex-wrap:wrap;gap:6px 15px;font-size:12px;color:#58695f}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.tips{padding-left:22px;margin:0;font-size:14px}.tips li{padding:5px 0}.cta{margin-top:26px;padding:25px 28px;background:#e5eee7;border:1px solid #cbdccc;border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:20px}.cta strong{font-size:17px}.cta p{font-size:13px}.cta a{background:#245b43;color:white;text-decoration:none;border-radius:10px;padding:12px 20px;white-space:nowrap;font-weight:650;font-size:14px}.cta a:hover{background:#194632}footer{text-align:center;font-size:12px;color:#738178;margin-top:22px}.error{color:#ad3b30;font-size:13px;min-height:21px;margin-top:10px}@media(max-width:760px){main{padding:26px 16px}.layout{grid-template-columns:1fr}.card{padding:20px}.cta{flex-direction:column;align-items:stretch}.cta a{text-align:center}}@media(max-width:380px){.fields{grid-template-columns:1fr}.income-row{grid-template-columns:1fr auto}.income-row label:first-child{grid-column:1/-1}.metrics{grid-template-columns:1fr}.balance{grid-column:auto}}
+</style>
+</head>
+<body><main>
+<header><div class="eyebrow">STUDENT BUDGET · CANADA</div><h1>在加拿大，每月花多少？</h1><p>把学费和生活费放在一起，让留学预算更清楚。</p><div class="privacy">数据只在浏览器计算，不上传</div></header>
+<div class="layout">
+<section class="card" aria-labelledby="input-title"><h2 id="input-title">填写你的预算</h2><p class="hint">金额单位均为 CAD（加元），生活费与收入按月填写。</p>
+<div class="fields" id="expenses">
+<label>学费 / 学期<input id="tuition" type="number" min="0" max="100000000" step="0.01" value="8000" inputmode="decimal"></label>
+<label>每学期月数<select id="months"><option value="3">3 个月</option><option value="4" selected>4 个月</option><option value="5">5 个月</option><option value="6">6 个月</option><option value="8">8 个月</option><option value="12">12 个月</option></select></label>
+<label>房租 / 月<input id="rent" type="number" min="0" max="100000000" step="0.01" value="700" inputmode="decimal"></label>
+<label>伙食 / 月<input id="food" type="number" min="0" max="100000000" step="0.01" value="450" inputmode="decimal"></label>
+<label>交通 / 月<input id="transport" type="number" min="0" max="100000000" step="0.01" value="100" inputmode="decimal"></label>
+<label>手机话费 / 月<input id="phone" type="number" min="0" max="100000000" step="0.01" value="65" inputmode="decimal"></label>
+<label>保险 / 月<input id="insurance" type="number" min="0" max="100000000" step="0.01" value="80" inputmode="decimal"></label>
+<label>其他 / 月<input id="other" type="number" min="0" max="100000000" step="0.01" value="100" inputmode="decimal"></label>
+</div><p class="hint" id="tuition-note"></p>
+<div class="income-heading"><h3>月收入</h3><button type="button" id="add-income">＋ 添加收入</button></div><div id="incomes"></div>
+<p class="hint">可分别填写兼职、奖学金、家庭支持等每月可用收入。页面初始值仅为示例；刷新后恢复示例。</p><div class="error" id="error" role="status"></div>
+</section>
+<section class="card" aria-labelledby="result-title"><h2 id="result-title">你的月度预算</h2>
+<div class="metrics" aria-live="polite" aria-atomic="true"><div class="metric"><span>月度总支出</span><strong class="amount" id="total-expense"></strong></div><div class="metric"><span>月度总收入</span><strong class="amount" id="total-income"></strong></div><div class="metric balance" id="balance-card"><span>月度结余</span><strong class="amount" id="balance"></strong><div id="balance-status"></div></div></div>
+<h3>支出明细</h3><div id="breakdown"></div><h3>各类别占比</h3><div id="share" class="share" role="img" aria-label="支出占比"></div><div id="legend" class="legend"></div>
+<h3>给你的省钱建议</h3><ul id="tips" class="tips"></ul><p class="hint">建议由当前金额自动生成；阈值用于预算提示，并非当地价格标准。</p>
+</section></div>
+<aside class="cta"><div><strong>📥 下载完整 Excel 版预算表（含 12 个月追踪、图表、自动提醒）</strong><p>想持续跟踪实际花费？用完整表格管理整年的预算。</p></div><a href="https://lwzcreations.gumroad.com/l/canadian-student-finance-chinese" target="_blank" rel="noopener noreferrer">查看 Excel 版 ↗</a></aside>
+<footer>纯前端 · 无需登录 · 无外部脚本或字体</footer>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const money=value=>new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CAD',currencyDisplay:'code',minimumFractionDigits:2,maximumFractionDigits:2}).format(value);
+const categories=[['tuition','学费','#315f49'],['rent','房租','#659174'],['food','伙食','#c5a25b'],['transport','交通','#658fa6'],['phone','手机话费','#9485ad'],['insurance','保险','#c58876'],['other','其他','#96a496']];
+let incomeId=0;
+function addIncome(name='',amount=''){
+ const row=document.createElement('div');row.className='income-row';const id=++incomeId;
+ const nameLabel=document.createElement('label');nameLabel.textContent='收入来源';const nameInput=document.createElement('input');nameInput.type='text';nameInput.placeholder='如：兼职 / 奖学金';nameInput.maxLength=60;nameInput.value=name;nameInput.id='income-name-'+id;nameLabel.htmlFor=nameInput.id;nameLabel.append(nameInput);
+ const amountLabel=document.createElement('label');amountLabel.textContent='金额 / 月';const amountInput=document.createElement('input');Object.assign(amountInput,{type:'number',min:'0',max:'100000000',step:'0.01',value:amount,inputMode:'decimal',className:'income-amount',id:'income-amount-'+id});amountLabel.htmlFor=amountInput.id;amountLabel.append(amountInput);
+ const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='×';remove.setAttribute('aria-label','删除第 '+id+' 项收入');remove.addEventListener('click',()=>{row.remove();update();});
+ row.append(nameLabel,amountLabel,remove);$('incomes').append(row);update();
+}
+function readAmount(input){const n=input.valueAsNumber;return Number.isFinite(n)?Math.min(100000000,Math.max(0,n)):0;}
+function update(){
+ const months=Number($('months').value);
+ // Round each monthly category to cents so the visible breakdown always sums to the total.
+ const entries=categories.map(([id,name,color])=>({id,name,color,cents:Math.round(readAmount($(id))*100/(id==='tuition'?months:1))}));
+ const total=entries.reduce((sum,e)=>sum+e.cents,0);const income=Array.from(document.querySelectorAll('.income-amount')).reduce((sum,input)=>sum+Math.round(readAmount(input)*100),0);const balance=income-total;
+ $('total-expense').textContent=money(total/100);$('total-income').textContent=money(income/100);$('balance').textContent=(balance>0?'+':'')+money(balance/100);
+ $('balance-card').className='metric balance'+(balance<0?' negative':balance===0?' neutral':'');$('balance-status').textContent=balance<0?'收入不足以覆盖支出，需要补足缺口。':balance>0?'每月有余量，可用于储蓄和应急。':'当前收支平衡。';
+ $('tuition-note').textContent='学费折算：'+money(readAmount($('tuition')))+' ÷ '+months+' 个月 = '+money(entries[0].cents/100)+' / 月（按分四舍五入）。';
+ const invalid=Array.from(document.querySelectorAll('input[type=number]')).some(input=>!input.validity.valid);
+ $('error').textContent=invalid?'请填写 0 至 100,000,000 CAD 的金额，最多两位小数；无效输入暂按 0、负数按 0、超上限按上限估算。':'';
+ $('breakdown').replaceChildren();$('share').replaceChildren();$('legend').replaceChildren();
+ const largest=Math.max(...entries.map(e=>e.cents),1);
+ for(const e of entries){const pct=total?e.cents/total*100:0;const row=document.createElement('div');row.className='chart-row';const label=document.createElement('div');label.className='chart-label';const name=document.createElement('span');name.textContent=e.name;const val=document.createElement('span');val.textContent=money(e.cents/100);label.append(name,val);const track=document.createElement('div');track.className='track';const bar=document.createElement('div');bar.className='bar';bar.style.width=e.cents/largest*100+'%';bar.style.background=e.color;track.append(bar);row.append(label,track);$('breakdown').append(row);
+ const segment=document.createElement('div');segment.style.width=pct+'%';segment.style.background=e.color;segment.title=e.name+' '+pct.toFixed(1)+'%';$('share').append(segment);const item=document.createElement('span');const dot=document.createElement('i');dot.className='dot';dot.style.background=e.color;item.append(dot,document.createTextNode(e.name+' '+pct.toFixed(1)+'%'));$('legend').append(item);}
+ $('share').setAttribute('aria-label',total?entries.map(e=>e.name+' '+(e.cents/total*100).toFixed(1)+'%').join('，'):'暂无支出，各类别占比为 0%');
+ const values=Object.fromEntries(entries.map(e=>[e.id,e.cents/100]));const tips=[];
+ if(balance<0)tips.push('每月收入缺口为 '+money(-balance/100)+'。先核对可削减支出，再评估奖学金或符合条件的兼职收入。');
+ if(total>0&&values.rent/(total/100)>0.4)tips.push('房租占总支出超过 40%。可比较合租或校内住宿，搬家前把通勤费用一起算上。');
+ if(values.food>400)tips.push('伙食超过 '+money(400)+' / 月。试试每周备餐、自己做饭；若减少 15%，每月约省 '+money(values.food*0.15)+'。');
+ if(values.phone>50)tips.push('手机话费超过 '+money(50)+' / 月。比较低流量或自带手机套餐，确认合约与取消费用。');
+ if(values.transport>120)tips.push('交通超过 '+money(120)+' / 月。核对学校是否提供学生交通优惠，并比较月票与单次出行费用。');
+ if(values.other>150)tips.push('其他支出超过 '+money(150)+' / 月。列出订阅与非必要消费，优先取消不常用的项目。');
+ if(values.tuition>0)tips.push('每月为学费预留 '+money(values.tuition)+'。学费通常集中缴纳，按月预留可减少开学时的现金压力。');
+ if(balance>0)tips.push('本月有 '+money(balance/100)+' 结余。可先建立应急储蓄，再安排非必要消费。');
+ const fallback=['每周记录一次实际支出，与预算对照，及早发现超支。','采购前列清单，比较单价，减少临时购买与食物浪费。','定期检查自动续费订阅，把省下的金额留作应急资金。'];
+ for(const tip of fallback){if(tips.length>=3)break;tips.push(tip);} $('tips').replaceChildren(...tips.slice(0,5).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
+}
+$('expenses').addEventListener('input',update);$('expenses').addEventListener('change',update);$('incomes').addEventListener('input',update);$('add-income').addEventListener('click',()=>{addIncome();$('incomes').lastElementChild.querySelector('input').focus();});addIncome('兼职 / 奖学金','1200');
+</script>
+</body></html>
