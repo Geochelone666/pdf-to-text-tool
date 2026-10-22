@@ -22,7 +22,7 @@
 `tests/budget.test.js` 用 Playwright 的 Chromium 打开 `index.html`，检查默认示例总额、学费按分取整、负数/空值/超上限输入、全零预算、收入增删与表单标签，并确认页面没有脚本错误或 NaN。
 
 ```bash
-npm install
+npm ci
 npx playwright install chromium
 npm test
 ```
