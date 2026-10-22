@@ -17,6 +17,18 @@
 
 全部 HTML、CSS 和 JavaScript 都在 `index.html` 中。修改后检查手机及桌面布局、零支出、收支平衡、负数或超上限输入、收入添加和删除，以及学期月数切换。无效数值的临时估算规则显示在页面中。
 
+## 测试
+
+`tests/budget.test.js` 用 Playwright 的 Chromium 打开 `index.html`，检查默认示例总额、学费按分取整、负数/空值/超上限输入、全零预算、收入增删与表单标签，并确认页面没有脚本错误或 NaN。
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
+
+GitHub Actions 的 `test` 工作流在每次推送和 PR 时运行同样的测试。
+
 ## 许可
 
 本仓库尚未指定开源许可证。公开可见不等于已授予再分发或修改许可；需要复用时请先联系维护者。
