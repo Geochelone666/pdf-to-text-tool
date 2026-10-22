@@ -29,6 +29,8 @@ npx playwright install chromium
 npm test
 ```
 
+`tests/a11y.test.js` 在 375px（手机）和 1280px 宽度下用 [axe-core](https://github.com/dequelabs/axe-core) 做 WCAG 2.1 A/AA 扫描，并检查页面没有横向溢出、没有控制台错误。
+
 GitHub Actions 的 `test` 工作流在每次推送和 PR 时运行同样的测试。
 
 ## 部署
