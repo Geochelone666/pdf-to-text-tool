@@ -31,6 +31,14 @@ npm test
 
 GitHub Actions 的 `test` 工作流在每次推送和 PR 时运行同样的测试。
 
+## 部署
+
+纯静态页面，无构建步骤、无环境变量、无后端。把 `index.html` 上传到任意静态托管即可（如 GitHub Pages：Settings → Pages → Deploy from a branch → `main` / root）。`package.json`、`package-lock.json` 和 `tests/` 只用于测试，不影响页面；若托管平台（Vercel / Netlify）检测到 `package.json`，构建命令留空、输出目录设为仓库根目录即可。
+
+| 环境变量 | 说明 |
+|---|---|
+| （无） | 页面不读取任何环境变量或密钥 |
+
 ## 许可
 
 本仓库尚未指定开源许可证。公开可见不等于已授予再分发或修改许可；需要复用时请先联系维护者。
