@@ -43,12 +43,14 @@ function addIncome(name='',amount=''){
  const row=document.createElement('div');row.className='income-row';const id=++incomeId;
  const nameLabel=document.createElement('label');nameLabel.textContent='收入来源';const nameInput=document.createElement('input');nameInput.type='text';nameInput.placeholder='如：兼职 / 奖学金';nameInput.maxLength=60;nameInput.value=name;nameInput.id='income-name-'+id;nameLabel.htmlFor=nameInput.id;nameLabel.append(nameInput);
  const amountLabel=document.createElement('label');amountLabel.textContent='金额 / 月';const amountInput=document.createElement('input');Object.assign(amountInput,{type:'number',min:'0',max:'100000000',step:'0.01',value:amount,inputMode:'decimal',className:'income-amount',id:'income-amount-'+id});amountLabel.htmlFor=amountInput.id;amountLabel.append(amountInput);
- const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='×';remove.setAttribute('aria-label','删除第 '+id+' 项收入');remove.addEventListener('click',()=>{row.remove();update();});
+ const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='×';remove.setAttribute('aria-label','删除第 '+id+' 项收入');remove.addEventListener('click',()=>{row.remove();update();$('add-income').focus();});
  row.append(nameLabel,amountLabel,remove);$('incomes').append(row);update();
 }
 function readAmount(input){const n=input.valueAsNumber;return Number.isFinite(n)?Math.min(100000000,Math.max(0,n)):0;}
 function update(){
  const months=Number($('months').value);
+ // Number remove buttons by visible position so screen readers never announce a stale index.
+ document.querySelectorAll('#incomes .remove').forEach((button,index)=>button.setAttribute('aria-label','删除第 '+(index+1)+' 项收入'));
  // Round each monthly category to cents so the visible breakdown always sums to the total.
  const entries=categories.map(([id,name,color])=>({id,name,color,cents:Math.round(readAmount($(id))*100/(id==='tuition'?months:1))}));
  const total=entries.reduce((sum,e)=>sum+e.cents,0);const income=Array.from(document.querySelectorAll('.income-amount')).reduce((sum,input)=>sum+Math.round(readAmount(input)*100),0);const balance=income-total;
