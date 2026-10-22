@@ -91,3 +91,55 @@ test('every form control has an accessible label', async () => {
   const unlabeled = await page.$$eval('input, select', els => els.filter(e => !e.labels?.length && !e.getAttribute('aria-label')).map(e => e.id));
   assert.deepEqual(unlabeled, []);
 });
+
+// WCAG AA contrast for every visible element with its own text (4.5:1, or 3:1 for large text).
+// Elements with transparent text (gradient-clipped headings) are skipped.
+async function lowContrast(page) {
+  return page.evaluate(() => {
+    const parse = c => { const m = c.match(/[\d.]+/g).map(Number); return { r: m[0], g: m[1], b: m[2], a: m[3] ?? 1 }; };
+    const mix = (c, base) => ({ r: c.r * c.a + base.r * (1 - c.a), g: c.g * c.a + base.g * (1 - c.a), b: c.b * c.a + base.b * (1 - c.a) });
+    const lum = ({ r, g, b }) => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+    const background = el => {
+      const layers = [];
+      for (let e = el; e; e = e.parentElement) { const c = parse(getComputedStyle(e).backgroundColor); if (c.a > 0) { layers.push(c); if (c.a >= 1) break; } }
+      return layers.reverse().reduce((base, c) => mix(c, base), { r: 255, g: 255, b: 255 });
+    };
+    const failures = [];
+    for (const el of document.querySelectorAll('body *')) {
+      if (!el.getClientRects().length || ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = getComputedStyle(el), fg = parse(cs.color);
+      if (fg.a === 0) continue;
+      const bg = background(el), l1 = lum(mix(fg, bg)), l2 = lum(bg);
+      const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      const size = parseFloat(cs.fontSize), large = size >= 24 || (size >= 18.66 && +cs.fontWeight >= 700);
+      if (ratio < (large ? 3 : 4.5)) failures.push(`${ratio.toFixed(2)} ${el.tagName} "${el.textContent.trim().slice(0, 30)}"`);
+    }
+    return failures;
+  });
+}
+
+test('text colours meet WCAG AA contrast', async () => {
+  assert.deepEqual(await lowContrast(page), []);
+  await page.fill('#rent', '-1'); // error + negative balance styles
+  assert.deepEqual(await lowContrast(page), []);
+});
+
+test('edge cases: many incomes, unicode names, tiny and huge amounts', async () => {
+  for (let i = 0; i < 40; i++) await page.click('#add-income');
+  const amounts = page.locator('.income-amount');
+  assert.equal(await amounts.count(), 41);
+  await page.locator('.income-row input[type=text]').nth(1).fill('奖学金 🎓 Bourse d’études <b>x</b>');
+  for (let i = 1; i < 41; i++) await amounts.nth(i).fill('0.01');
+  assert.equal(await amount('#total-income'), 1200.4); // 1200 + 40 x 0.01, no float drift
+  assert.equal(await page.locator('#incomes b').count(), 0); // names are text, not markup
+  await amounts.nth(0).fill('100000000');
+  for (const id of ['tuition', 'rent', 'food', 'transport', 'phone', 'insurance', 'other']) await fill('#' + id, 100000000);
+  assert.equal(await amount('#total-expense'), 625000000); // 1e8 / 4 + 6 x 1e8
+  await noNaN();
+  await fill('#rent', '1e5'); // exponent notation is a valid number input
+  assert.equal(await page.$eval('#rent', e => e.validity.valid), true);
+  await fill('#rent', '0.005'); // finer than a cent: flagged, still rounded
+  assert.notEqual((await page.textContent('#error')).trim(), '');
+  await noNaN();
+  assert.deepEqual(errors, []);
+});
