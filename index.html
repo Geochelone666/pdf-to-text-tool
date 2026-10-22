@@ -51,8 +51,8 @@ function update(){
  const months=Number($('months').value);
  // Number remove buttons by visible position so screen readers never announce a stale index.
  document.querySelectorAll('#incomes .remove').forEach((button,index)=>button.setAttribute('aria-label','删除第 '+(index+1)+' 项收入'));
- // Round each monthly category to cents so the visible breakdown always sums to the total.
- const entries=categories.map(([id,name,color])=>({id,name,color,cents:Math.round(readAmount($(id))*100/(id==='tuition'?months:1))}));
+ // Convert input to integer cents first so floating-point multiplication cannot round half a cent down.
+ const entries=categories.map(([id,name,color])=>({id,name,color,cents:Math.round(Math.round(readAmount($(id))*100)/(id==='tuition'?months:1))}));
  const total=entries.reduce((sum,e)=>sum+e.cents,0);const income=Array.from(document.querySelectorAll('.income-amount')).reduce((sum,input)=>sum+Math.round(readAmount(input)*100),0);const balance=income-total;
  $('total-expense').textContent=money(total/100);$('total-income').textContent=money(income/100);$('balance').textContent=(balance>0?'+':'')+money(balance/100);
  $('balance-card').className='metric balance'+(balance<0?' negative':balance===0?' neutral':'');$('balance-status').textContent=balance<0?'收入不足以覆盖支出，需要补足缺口。':balance>0?'每月有余量，可用于储蓄和应急。':'当前收支平衡。';

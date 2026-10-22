@@ -143,3 +143,11 @@ test('edge cases: many incomes, unicode names, tiny and huge amounts', async () 
   await noNaN();
   assert.deepEqual(errors, []);
 });
+
+
+test('tuition 2.01 divided over six months rounds half a cent upward', async () => {
+  await page.locator('#tuition').fill('2.01');
+  await page.locator('#months').selectOption('6');
+  assert.match(await page.locator('#tuition-note').textContent(), /= CAD\s*0\.34/);
+  assert.equal(await amount('#total-expense'), 1495.34);
+});
