@@ -17,13 +17,19 @@
 
 全部 HTML、CSS 和 JavaScript 都在 `index.html` 中。修改后检查手机及桌面布局、零支出、收支平衡、负数或超上限输入、收入添加和删除，以及学期月数切换。无效数值的临时估算规则显示在页面中。
 
-金额先转成整数分，再按月折算并四舍五入，避免二进制浮点误差使半分向下取整。自动浏览器回归测试覆盖学费半分、合计与结余、收入增删、零支出和金额上下限。仅开发测试需要 Node.js 22 和 Chromium，页面使用仍无需依赖：
+金额先转成整数分，再按月折算并四舍五入，避免二进制浮点误差使半分向下取整（如 2.01 CAD ÷ 6 个月应为 0.34 CAD/月）。
+
+## 测试
+
+`tests/budget.test.js` 用 Playwright 的 Chromium 打开 `index.html`，检查默认示例总额、学费按分取整、负数/空值/超上限输入、全零预算、收入增删与表单标签，并确认页面没有脚本错误或 NaN。
 
 ```bash
 npm ci
 npx playwright install chromium
 npm test
 ```
+
+GitHub Actions 的 `test` 工作流在每次推送和 PR 时运行同样的测试。
 
 ## 许可
 
