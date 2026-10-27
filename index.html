@@ -29,6 +29,7 @@
 </section>
 <section class="card" aria-labelledby="result-title"><h2 id="result-title">你的月度预算</h2>
 <div class="metrics" aria-live="polite" aria-atomic="true"><div class="metric"><span>月度总支出</span><strong class="amount" id="total-expense"></strong></div><div class="metric"><span>月度总收入</span><strong class="amount" id="total-income"></strong></div><div class="metric"><span>一次性支出总计</span><strong class="amount" id="total-once"></strong></div><div class="metric balance" id="balance-card"><span>月度结余</span><strong class="amount" id="balance"></strong><div id="balance-status"></div></div></div>
+<h3 id="semester-title">学期总览</h3><div class="metrics"><div class="metric"><span>学期总支出估算</span><strong class="amount" id="sem-expense"></strong></div><div class="metric"><span>学期总收入估算</span><strong class="amount" id="sem-income"></strong></div><div class="metric balance" id="sem-balance-card"><span>学期结余估算</span><strong class="amount" id="sem-balance"></strong></div></div><p class="hint">学期总支出 = 一次性支出 + 月度总支出 × 学期月数；学期总收入 = 月度总收入 × 学期月数。仅为估算。</p>
 <h3>支出明细</h3><div id="breakdown"></div><h3>各类别占比</h3><div id="share" class="share" role="img" aria-label="支出占比"></div><div id="legend" class="legend"></div>
 <h3>给你的省钱建议</h3><ul id="tips" class="tips"></ul><p class="hint">建议由当前金额自动生成；阈值用于预算提示，并非当地价格标准。</p>
 </section></div>
@@ -67,6 +68,10 @@ function update(){
  const total=entries.reduce((sum,e)=>sum+e.cents,0);const income=Array.from(document.querySelectorAll('.income-amount')).reduce((sum,input)=>sum+Math.round(readAmount(input)*100),0);const balance=income-total;
  const once=Array.from(document.querySelectorAll('.once-amount')).reduce((sum,input)=>sum+Math.round(readAmount(input)*100),0);
  $('total-once').textContent=money(once/100);
+ const semExpense=once+total*months,semIncome=income*months,semBalance=semIncome-semExpense;
+ $('semester-title').textContent='学期总览（'+months+' 个月）';
+ $('sem-expense').textContent=money(semExpense/100);$('sem-income').textContent=money(semIncome/100);$('sem-balance').textContent=(semBalance>0?'+':'')+money(semBalance/100);
+ $('sem-balance-card').className='metric balance'+(semBalance<0?' negative':semBalance===0?' neutral':'');
  $('total-expense').textContent=money(total/100);$('total-income').textContent=money(income/100);$('balance').textContent=(balance>0?'+':'')+money(balance/100);
  $('balance-card').className='metric balance'+(balance<0?' negative':balance===0?' neutral':'');$('balance-status').textContent=balance<0?'收入不足以覆盖支出，需要补足缺口。':balance>0?'每月有余量，可用于储蓄和应急。':'当前收支平衡。';
  $('tuition-note').textContent='学费折算：'+money(readAmount($('tuition')))+' ÷ '+months+' 个月 = '+money(entries[0].cents/100)+' / 月（按分四舍五入）。';
