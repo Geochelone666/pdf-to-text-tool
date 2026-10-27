@@ -202,3 +202,24 @@ test('semester overview: months selector and one-time costs feed the estimate', 
   await noNaN();
   assert.deepEqual(errors, []);
 });
+
+test('print stylesheet: controls hidden, single column, chart colours kept', async () => {
+  await page.emulateMedia({ media: 'print' });
+  for (const sel of ['#add-income', '#add-once', '.cta', 'footer']) {
+    assert.equal(await page.locator(sel).first().isVisible(), false, sel);
+  }
+  assert.equal(await page.locator('.remove').first().isVisible(), false);
+  assert.equal(await page.locator('.remove-once').first().isVisible(), false);
+  // Single column: the result card sits below the input card.
+  const inputBox = await page.locator('section.card').first().boundingBox();
+  const resultBox = await page.locator('section.card').nth(1).boundingBox();
+  assert.ok(resultBox.y >= inputBox.y + inputBox.height - 1, JSON.stringify({ inputBox, resultBox }));
+  // Chart bars and balance card keep their colours on paper.
+  assert.equal(await page.$eval('.bar', e => getComputedStyle(e).printColorAdjust), 'exact');
+  assert.equal(await page.$eval('#balance-card', e => getComputedStyle(e).printColorAdjust), 'exact');
+  await noNaN();
+  // Back to screen: everything interactive is visible again.
+  await page.emulateMedia({ media: 'screen' });
+  assert.equal(await page.locator('#add-income').isVisible(), true);
+  assert.deepEqual(errors, []);
+});
