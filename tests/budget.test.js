@@ -151,3 +151,30 @@ test('tuition 2.01 divided over six months rounds half a cent upward', async () 
   assert.match(await page.locator('#tuition-note').textContent(), /= CAD\s*0\.34/);
   assert.equal(await amount('#total-expense'), 1495.34);
 });
+
+test('one-time costs: default example, add/remove rows, amortization tip', async () => {
+  // Default example row: 1500, monthly balance untouched.
+  assert.equal(await amount('#total-once'), 1500);
+  assert.equal(await amount('#balance'), -2295);
+  await page.click('#add-once');
+  assert.match(await page.evaluate(() => document.activeElement.id), /^once-name-/);
+  await page.locator('.once-amount').nth(1).fill('500');
+  assert.equal(await amount('#total-once'), 2000);
+  // Amortization tip: 2000 over the selected 4 months -> 500 per month.
+  const tips = await page.$$eval('#tips li', els => els.map(e => e.textContent));
+  assert.ok(tips.some(t => /一次性支出共 CAD\s*2,000\.00/.test(t) && /每月预留 CAD\s*500\.00/.test(t)), JSON.stringify(tips));
+  // Remove the first row: total updates, buttons renumbered, focus kept on the add button.
+  await page.locator('#once-items .remove-once').first().click();
+  assert.equal(await amount('#total-once'), 500);
+  const labels = await page.$$eval('#once-items .remove-once', els => els.map(e => e.getAttribute('aria-label')));
+  assert.equal(labels.length, 1);
+  labels.forEach((label, i) => assert.match(label, new RegExp(`\\b${i + 1}\\b`)));
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'add-once');
+  // Clearing all one-time rows removes the tip and shows a zero total without NaN.
+  await page.locator('#once-items .remove-once').first().click();
+  assert.equal(await amount('#total-once'), 0);
+  const tipsAfter = await page.$$eval('#tips li', els => els.map(e => e.textContent));
+  assert.ok(!tipsAfter.some(t => t.includes('一次性支出共')), JSON.stringify(tipsAfter));
+  await noNaN();
+  assert.deepEqual(errors, []);
+});
