@@ -178,3 +178,27 @@ test('one-time costs: default example, add/remove rows, amortization tip', async
   await noNaN();
   assert.deepEqual(errors, []);
 });
+
+test('semester overview: months selector and one-time costs feed the estimate', async () => {
+  // Default: once 1500 + 3495 x 4 = 15480; income 1200 x 4 = 4800.
+  assert.match(await page.textContent('#semester-title'), /4 个月/);
+  assert.equal(await amount('#sem-expense'), 15480);
+  assert.equal(await amount('#sem-income'), 4800);
+  assert.equal(await amount('#sem-balance'), -10680);
+  assert.match(await page.getAttribute('#sem-balance-card', 'class'), /negative/);
+  // Switching to 3 months: tuition 2666.67 + 1495 = 4161.67/month -> 1500 + 12485.01
+  await page.selectOption('#months', '3');
+  assert.match(await page.textContent('#semester-title'), /3 个月/);
+  assert.equal(await amount('#sem-expense'), 13985.01);
+  assert.equal(await amount('#sem-income'), 3600);
+  // Removing the only one-time row drops it from the semester total.
+  await page.locator('#once-items .remove-once').first().click();
+  assert.equal(await amount('#sem-expense'), 12485.01);
+  // A balanced semester shows the neutral style.
+  await page.selectOption('#months', '4');
+  await page.locator('.income-amount').first().fill('3495');
+  assert.equal(await amount('#sem-balance'), 0);
+  assert.match(await page.getAttribute('#sem-balance-card', 'class'), /neutral/);
+  await noNaN();
+  assert.deepEqual(errors, []);
+});
