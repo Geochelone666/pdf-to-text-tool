@@ -223,3 +223,32 @@ test('print stylesheet: controls hidden, single column, chart colours kept', asy
   assert.equal(await page.locator('#add-income').isVisible(), true);
   assert.deepEqual(errors, []);
 });
+
+test('savings goal: remaining-based estimate, reached and edge states', async () => {
+  assert.equal(await page.$eval('#goal-note', e => e.hidden), true);
+  // Default balance is negative: goal shows the no-surplus message with remaining amount.
+  await fill('#goal', 3000);
+  assert.match(await page.textContent('#goal-note'), /储蓄目标 CAD\s*3,000\.00，已有 CAD\s*0\.00，还差 CAD\s*3,000\.00：当前无月度结余/);
+  assert.equal(await page.$eval('#goal-note', e => e.hidden), false);
+  // Income 5000 -> monthly balance 1505; remaining 3000 -> 2 months (ceil), estimate-only wording.
+  await page.locator('.income-amount').first().fill('5000');
+  assert.match(await page.textContent('#goal-note'), /约需 2 个月（仅为估算，不含利息，不代表承诺）/);
+  // Current savings reduce the remainder: 3105 - 100 = 3005 -> ceil(300500/150500) = 2; 3205-100 -> 3.
+  await fill('#saved', 100);
+  await fill('#goal', 3205);
+  assert.match(await page.textContent('#goal-note'), /还差 CAD\s*3,105\.00/);
+  assert.match(await page.textContent('#goal-note'), /约需 3 个月/);
+  // Savings at or above the goal: reached, no months estimate.
+  await fill('#saved', 3205);
+  assert.match(await page.textContent('#goal-note'), /目标已达成/);
+  assert.doesNotMatch(await page.textContent('#goal-note'), /约需/);
+  // Over-saved is clamped to the goal in the message.
+  await fill('#saved', 9999);
+  assert.match(await page.textContent('#goal-note'), /已有储蓄 CAD\s*3,205\.00，目标已达成/);
+  // Explicit 0 goal hides the note, same as empty.
+  await fill('#saved', '');
+  await fill('#goal', 0);
+  assert.equal(await page.$eval('#goal-note', e => e.hidden), true);
+  await noNaN();
+  assert.deepEqual(errors, []);
+});
