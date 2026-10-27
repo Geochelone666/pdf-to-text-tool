@@ -217,6 +217,9 @@ test('print stylesheet: controls hidden, single column, chart colours kept', asy
   // Chart bars and balance card keep their colours on paper.
   assert.equal(await page.$eval('.bar', e => getComputedStyle(e).printColorAdjust), 'exact');
   assert.equal(await page.$eval('#balance-card', e => getComputedStyle(e).printColorAdjust), 'exact');
+  // The share heading, bar and legend form one block that cannot split across pages.
+  assert.equal(await page.$eval('.share-block', e => getComputedStyle(e).breakInside), 'avoid');
+  assert.equal(await page.$eval('.share-block h3', e => getComputedStyle(e).breakAfter), 'avoid');
   await noNaN();
   // Back to screen: everything interactive is visible again.
   await page.emulateMedia({ media: 'screen' });
