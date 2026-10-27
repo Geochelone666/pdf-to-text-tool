@@ -26,10 +26,11 @@
 <div class="income-heading"><h3>一次性支出</h3><button type="button" id="add-once">＋ 添加一次性支出</button></div><div id="once-items"></div>
 <p class="hint">机票、押金、书本等落地成本，按总额填写；单独汇总，不计入月度结余。</p>
 <div class="income-heading"><h3>月收入</h3><button type="button" id="add-income">＋ 添加收入</button></div><div id="incomes"></div>
-<p class="hint">可分别填写兼职、奖学金、家庭支持等每月可用收入。页面初始值仅为示例；刷新后恢复示例。</p><div class="error" id="error" role="status"></div>
+<p class="hint">可分别填写兼职、奖学金、家庭支持等每月可用收入。页面初始值仅为示例；刷新后恢复示例。</p><div class="fields"><label>储蓄目标（可选）<input id="goal" type="number" min="0" max="100000000" step="0.01" placeholder="如：3000 加元应急金" inputmode="decimal"></label><label>已有储蓄（可选）<input id="saved" type="number" min="0" max="100000000" step="0.01" placeholder="已存下的金额" inputmode="decimal"></label></div><div class="error" id="error" role="status"></div>
 </section>
 <section class="card" aria-labelledby="result-title"><h2 id="result-title">你的月度预算</h2>
 <div class="metrics" aria-live="polite" aria-atomic="true"><div class="metric"><span>月度总支出</span><strong class="amount" id="total-expense"></strong></div><div class="metric"><span>月度总收入</span><strong class="amount" id="total-income"></strong></div><div class="metric"><span>一次性支出总计</span><strong class="amount" id="total-once"></strong></div><div class="metric balance" id="balance-card"><span>月度结余</span><strong class="amount" id="balance"></strong><div id="balance-status"></div></div></div>
+<p class="hint" id="goal-note" hidden></p>
 <h3 id="semester-title">学期总览</h3><div class="metrics"><div class="metric"><span>学期总支出估算</span><strong class="amount" id="sem-expense"></strong></div><div class="metric"><span>学期总收入估算</span><strong class="amount" id="sem-income"></strong></div><div class="metric balance" id="sem-balance-card"><span>学期结余估算</span><strong class="amount" id="sem-balance"></strong></div></div><p class="hint">学期总支出 = 一次性支出 + 月度总支出 × 学期月数；学期总收入 = 月度总收入 × 学期月数。仅为估算。</p>
 <h3>支出明细</h3><div id="breakdown"></div><h3>各类别占比</h3><div id="share" class="share" role="img" aria-label="支出占比"></div><div id="legend" class="legend"></div>
 <h3>给你的省钱建议</h3><ul id="tips" class="tips"></ul><p class="hint">建议由当前金额自动生成；阈值用于预算提示，并非当地价格标准。</p>
@@ -73,6 +74,12 @@ function update(){
  $('semester-title').textContent='学期总览（'+months+' 个月）';
  $('sem-expense').textContent=money(semExpense/100);$('sem-income').textContent=money(semIncome/100);$('sem-balance').textContent=(semBalance>0?'+':'')+money(semBalance/100);
  $('sem-balance-card').className='metric balance'+(semBalance<0?' negative':semBalance===0?' neutral':'');
+ const goal=Math.round(readAmount($('goal'))*100),saved=Math.round(readAmount($('saved'))*100),remaining=Math.max(0,goal-saved);
+ if(goal>0&&remaining===0)$('goal-note').textContent='储蓄目标 '+money(goal/100)+'：已有储蓄 '+money(Math.min(saved,goal)/100)+'，目标已达成。';
+ else if(goal>0&&balance>0)$('goal-note').textContent='储蓄目标 '+money(goal/100)+'，已有 '+money(saved/100)+'，还差 '+money(remaining/100)+'：若月度结余保持 '+money(balance/100)+' 不变，约需 '+Math.ceil(remaining/balance)+' 个月（仅为估算，不含利息，不代表承诺）。';
+ else if(goal>0)$('goal-note').textContent='储蓄目标 '+money(goal/100)+'，已有 '+money(saved/100)+'，还差 '+money(remaining/100)+'：当前无月度结余，需先平衡收支或增加收入。';
+ else $('goal-note').textContent='';
+ $('goal-note').hidden=!$('goal-note').textContent;
  $('total-expense').textContent=money(total/100);$('total-income').textContent=money(income/100);$('balance').textContent=(balance>0?'+':'')+money(balance/100);
  $('balance-card').className='metric balance'+(balance<0?' negative':balance===0?' neutral':'');$('balance-status').textContent=balance<0?'收入不足以覆盖支出，需要补足缺口。':balance>0?'每月有余量，可用于储蓄和应急。':'当前收支平衡。';
  $('tuition-note').textContent='学费折算：'+money(readAmount($('tuition')))+' ÷ '+months+' 个月 = '+money(entries[0].cents/100)+' / 月（按分四舍五入）。';
@@ -97,7 +104,7 @@ function update(){
  for(const tip of fallback){if(tips.length>=3)break;tips.push(tip);} $('tips').replaceChildren(...tips.slice(0,5).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
 }
 $('expenses').addEventListener('input',update);$('expenses').addEventListener('change',update);$('incomes').addEventListener('input',update);$('add-income').addEventListener('click',()=>{addIncome();$('incomes').lastElementChild.querySelector('input').focus();});
-$('once-items').addEventListener('input',update);$('add-once').addEventListener('click',()=>{addOnce();$('once-items').lastElementChild.querySelector('input').focus();});
+$('goal').addEventListener('input',update);$('saved').addEventListener('input',update);$('once-items').addEventListener('input',update);$('add-once').addEventListener('click',()=>{addOnce();$('once-items').lastElementChild.querySelector('input').focus();});
 addOnce('机票 / 押金','1500');addIncome('兼职 / 奖学金','1200');
 </script>
 </body></html>
